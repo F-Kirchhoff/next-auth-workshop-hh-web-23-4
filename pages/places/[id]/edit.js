@@ -10,6 +10,7 @@ export default function EditPage() {
   const { isReady } = router;
   const { id } = router.query;
   const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
+  const session = useSession();
 
   async function editPlace(place) {
     await fetch(`/api/places/${id}`, {
@@ -20,6 +21,10 @@ export default function EditPage() {
       },
     });
     router.push("/");
+  }
+
+  if (session.status !== "authenticated") {
+    return <h1>Noth Authorized</h1>;
   }
 
   if (!isReady || isLoading || error) return <h2>Loading...</h2>;

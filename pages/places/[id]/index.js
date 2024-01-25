@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { StyledLink } from "../../../components/StyledLink.js";
 import { StyledButton } from "../../../components/StyledButton.js";
 import { StyledImage } from "../../../components/StyledImage.js";
+import { useSession } from "next-auth/react";
 
 const ImageContainer = styled.div`
   position: relative;
@@ -32,6 +33,8 @@ export default function DetailsPage() {
   const router = useRouter();
   const { isReady } = router;
   const { id } = router.query;
+  const session = useSession();
+  const isLoggedIn = session.status === "authenticated";
 
   const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
 
@@ -67,14 +70,16 @@ export default function DetailsPage() {
         <StyledLocationLink>Location on Google Maps</StyledLocationLink>
       </Link>
       <p>{place.description}</p>
-      <ButtonContainer>
-        <Link href={`/places/${id}/edit`} passHref legacyBehavior>
-          <StyledLink>Edit</StyledLink>
-        </Link>
-        <StyledButton onClick={deletePlace} type="button" $variant="delete">
-          Delete
-        </StyledButton>
-      </ButtonContainer>
+      {isLoggedIn && (
+        <ButtonContainer>
+          <Link href={`/places/${id}/edit`} passHref legacyBehavior>
+            <StyledLink>Edit</StyledLink>
+          </Link>
+          <StyledButton onClick={deletePlace} type="button" $variant="delete">
+            Delete
+          </StyledButton>
+        </ButtonContainer>
+      )}
     </>
   );
 }

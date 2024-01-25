@@ -28,11 +28,22 @@ export default function Home() {
   const session = useSession();
   const isLoggedIn = session.status === "authenticated";
 
+  if (!isLoggedIn) {
+    return <h1>Not Authorized!</h1>;
+  }
+
+  if (!data) {
+    return <h1>loading...</h1>;
+  }
+
+  const userPlaces = data.filter(
+    (place) => place.author === session.data.user.name
+  );
+
   return (
     <>
-      <Link href="/profile">Profile</Link>
       <List role="list">
-        {data.map((place) => {
+        {userPlaces.map((place) => {
           return (
             <ListItem key={place._id}>
               <Card
@@ -46,11 +57,9 @@ export default function Home() {
           );
         })}
       </List>
-      {isLoggedIn && (
-        <Link href="/create" passHref legacyBehavior>
-          <FixedLink>+ place</FixedLink>
-        </Link>
-      )}
+      <Link href="/create" passHref legacyBehavior>
+        <FixedLink>+ place</FixedLink>
+      </Link>
     </>
   );
 }
